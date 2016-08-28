@@ -15,7 +15,8 @@ Task.create = function(user, name){
       else {
         db.query(`
           MATCH (u:User) WHERE ID(u) = ${user.id}
-          MERGE (t:Task {name: ${name}})<-[:DOES {complete: false, startedAt: ${moment()}}]-(u)
+          MERGE (t:Task {name: ${name}})
+          CREATE (t)<-[:DOES {complete: false, startedAt: ${moment()}}]-(u)
           RETURN t
           `, (err, result) => {
           if(err)
@@ -76,12 +77,31 @@ Task.incomplete = function(user, name){
   })
 }
 
-Task.findUsers = function(id, status){
+Task.update = function(userId, taskId, newName){
+  db.query(`
+    MATCH (t:Task)<-[d:DOES]-(u:User)
+    WHERE ID(u) = ${userId} AND ID(t) = ${taskId}
+    MERGE (t2:Task {name: ${newName}})
+    CREATE (u)-[d2:DOES]->(t2)
+	  WITH d, d2, t2, u, t
+    SET d2.complete = d.complete
+	  SET d2.completedAt = d2.completedAt
+	  DELETE d
+    RETURN u, d2, t2
+  `, (err, result) => {
+    if(err)
+      reject(err)
+    else
+      resolve(result)
+  })
+}
+
+Task.findUsers = function(taskId, status){
   status = typeof status === 'undefined' ? "" : "d.complete = " + status
   return new Promise((resolve, reject) => {
     db.query(`
       MATCH (t:Task)<-[d:DOES]-(u:User)
-      WHERE ID(t) = ${id} ${status}
+      WHERE ID(t) = ${taskId} ${status}
       `)
   })
 }
