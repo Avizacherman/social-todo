@@ -7,6 +7,8 @@ An app for you to make a todo list, and see others who have the same items to do
 A user will be able to:
 - Sign up for an account
 - Add items to their own to do list
+- Complete items
+- Edit items
 - View other users who have the same items on their to do list
 - View other users to do lists
 
