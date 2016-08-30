@@ -1,12 +1,14 @@
-<div ng-controller="loginController">
-  <input ng-model="email"/>
-  <input type="password" ng-model="password"/>
-  <button ng-click="login()">Submit </button>
-</div>
+<form ng-submit="login()">
+  <input ng-model="loginEmail"/>
+  <input type="password" ng-model="loginPassword"/>
+  <button>Submit </button>
+</form>
+<div ng-show="loginError"> Invalid Email/Password</div>
 
-<div ng-controller="signupController">
-  <input ng-model="name">
-  <input ng-model="email">
-  <input type="password" ng-model="signupPassword">
-  <button ng-click="signup()"> Submit </button>
-</div>
+<form ng-submit="submit()">
+  <input placeholder="name" ng-model="signupName">
+  <input placeholder="email" ng-model="signupEmail">
+  <input placeholder="password" type="password" ng-model="signupPassword">
+  <button> Submit </button>
+</form>
+<div ng-show="signupError"> Something went wrong on signup </div>

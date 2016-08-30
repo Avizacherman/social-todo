@@ -9,6 +9,13 @@ function sanitize(user){
   return user
 }
 
+User.findById = function(id){
+  this.findById(id)
+  .then(user => {
+    return sanitize(user)
+  })
+}
+
 User.create = function(user){
   return new Promise( (resolve, reject) => {
     try {
@@ -28,21 +35,14 @@ User.create = function(user){
     catch(err){
       reject(err)
     }
-    //Check to see if this user exists already to prevent duplicats
-    this.findOne({email: sanitizedUser.email})
-    .then(user => {
-      if(user){
-        reject({msg: `USER WITH EMAIL ${sanitizedUser.email} ALREADY EXISTS`})
-      } else {
-        //save the sanitized user so only values we pass in get through as a form of whitelisting
-        db.save(sanitizedUser, 'User', (err, user) => {
-          if(err){
-            reject(err)
-          } else {
-            this.id = user.id
-            resolve(user)
-          }
-        })
+    // There are no migration files for neo4j (which makes it a little tricky)
+    // However, a unique constraint was set on the User label, forcing emails to be unique
+    db.save(sanitizedUser, 'User', (err, user) => {
+      if(err)
+        reject(err)
+      else {
+        this.id = user.id
+        resolve(user)
       }
     })
   })
@@ -65,7 +65,7 @@ User.validate = function(email, password){
   })
 }
 
-User.getTasks = function(id, status){
+User.getTasks = function(userid, status){
   // if status is blank replace it with "" for use in the query, otherwise, add a search for the status
   status = typeof status === 'undefined' ? "" : "d.complete = " + status
   return new Promise((resolve, reject) => {
@@ -74,8 +74,8 @@ User.getTasks = function(id, status){
     // all the associated tasks, then return them all.
     db.query(`
     MATCH(u:User)-[d:DOES]->(t:Task)
-    WHERE ID(u) = ${id} ${status}
-    RETURN u, t, d
+    WHERE ID(u) = ${userid} ${status}
+    RETURN t, d
     `, (err, result) => {
       if(err)
         reject(err)
@@ -85,13 +85,13 @@ User.getTasks = function(id, status){
   })
 }
 
-User.getTask = function(id, task){
+User.getTask = function(userid, taskid){
   return new Promise((resolve, reject) => {
     // Cypher Query - Find a sepcific task if (and only if) it's related to the user
     db.query(`
-    MATCH(u:User)-[r]->(t:Task)
-    WHERE ID(u) = ${id} AND t.name = "${task}"
-    RETURN t, r
+    MATCH(u:User)-[d:DOES]->(t:Task)
+    WHERE ID(u) = ${userid} AND ID(t) = "${taskid}"
+    RETURN t, d
     `, (err, result) => {
       if(err)
         reject(err)

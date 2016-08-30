@@ -3,6 +3,8 @@ var router = express.Router()
 
 var User = require('../models/user')
 
+var jsonWrapper = ('../lib/jsonWrapper')
+
 module.exports = function(passport){
 
   router.post('/login', (req, res, next) => {
@@ -22,7 +24,8 @@ module.exports = function(passport){
     })(req, res, next)
   })
 
-  router.post('/logout', (req, res) => {
+  router.get('/logout', (req, res) => {
+    console.log(req.user)
     req.logout()
     res.redirect('/')
   })
@@ -31,12 +34,20 @@ module.exports = function(passport){
     User.create(req.body)
     .then(user => {
       passport.authenticate('local', (err, user) => {
-        res.json({success: true, msg: "Succesfully Created New User and Logged In"})
+        if(err)
+          res.json(jsonWrapper.failure(err, "Unable to log in"))
+        else{
+          req.login(user, (err, user) => {
+            if(err)
+              res.json(jsonWrapper.failure(err, "Unable to log in"))
+            else
+              res.json(jsonWrapper.success(user, "Succesfully logged in"))
+          })
+        }
       })(req, res, next)
     })
     .catch(err => {
-      console.log(err)
-      res.json(err)
+      res.json(jsonWrapper.failure(err, "Unable to log in"))
     })
   })
 

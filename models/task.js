@@ -59,11 +59,11 @@ Task.incomplete = function(user, name){
     User.getTask(user.id, name)
     .then(result => {
       db.query(`
-        MATCH (u:User) WHERE ID(u) = ${user.id}
-        MATCH (t:Task {name: "${name}"})<-[d:DOES]-(u)
-        SET d.complete = false
-        REMOVE d.completedAt
-        RETURN u,t,d
+        MATCH (user:User) WHERE ID(user) = ${user.id}
+        MATCH (task:Task {name: "${name}"})<-[does:DOES]-(user)
+        SET does.complete = false
+        REMOVE does.completedAt
+        RETURN user, does, task
         `, (err, result) => {
         if(err)
           reject(err)
@@ -79,15 +79,15 @@ Task.incomplete = function(user, name){
 
 Task.update = function(userId, taskId, newName){
   db.query(`
-    MATCH (t:Task)<-[d:DOES]-(u:User)
+    MATCH (t:Task)<-[d:DOES]-(user:User)
     WHERE ID(u) = ${userId} AND ID(t) = ${taskId}
     MERGE (t2:Task {name: ${newName}})
-    CREATE (u)-[d2:DOES]->(t2)
-	  WITH d, d2, t2, u, t
-    SET d2.complete = d.complete
-	  SET d2.completedAt = d2.completedAt
+    CREATE (u)-[does:DOES]->(task)
+	  WITH d, does, task, user, t
+    SET does.complete = d.complete
+	  SET does.completedAt = d.completedAt
 	  DELETE d
-    RETURN u, d2, t2
+    RETURN user, does, task
   `, (err, result) => {
     if(err)
       reject(err)
@@ -96,12 +96,13 @@ Task.update = function(userId, taskId, newName){
   })
 }
 
-Task.findUsers = function(taskId, status){
-  status = typeof status === 'undefined' ? "" : "d.complete = " + status
+Task.findWithOtherUsers = function(userId, taskId, status){
+  status = typeof status === 'undefined' ? "" : "AND d.complete = " + status
   return new Promise((resolve, reject) => {
     db.query(`
-      MATCH (t:Task)<-[d:DOES]-(u:User)
-      WHERE ID(t) = ${taskId} ${status}
+      MATCH (u:User)-[:DOES]->(t:Task)<-[d:DOES]-(users:Users)
+      WHERE ID(t) = ${taskId} AND ID(u) = ${userId} ${status}
+      RETURN users, task, does
       `)
   })
 }

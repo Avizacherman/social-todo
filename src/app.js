@@ -1,9 +1,10 @@
 import angular from 'angular'
 import ngRoute from 'angular-route'
 
-import loginController from './controllers/loginController'
-import signupController from './controllers/signupController'
-import logoutController from './controllers/logoutController'
+import authController from './controllers/authController'
+import mainController from './controllers/mainController'
+import sidebarController from './controllers/sidebarController'
+
 
 import routes from './config/routes'
 
@@ -11,6 +12,6 @@ const app = angular.module('SoToDo', [ngRoute])
 
 app
 .config(routes)
-.controller('loginController', loginController)
-.controller('signupController', signupController)
-.controller('logoutController', logoutController)
+.controller('authController', authController)
+.controller('mainController', mainController)
+.controller('sidebarController', sidebarController)

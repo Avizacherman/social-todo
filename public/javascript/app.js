@@ -54,19 +54,19 @@
 
 	var _angularRoute2 = _interopRequireDefault(_angularRoute);
 
-	var _loginController = __webpack_require__(5);
+	var _authController = __webpack_require__(10);
 
-	var _loginController2 = _interopRequireDefault(_loginController);
+	var _authController2 = _interopRequireDefault(_authController);
 
-	var _signupController = __webpack_require__(8);
+	var _mainController = __webpack_require__(12);
 
-	var _signupController2 = _interopRequireDefault(_signupController);
+	var _mainController2 = _interopRequireDefault(_mainController);
 
-	var _logoutController = __webpack_require__(9);
+	var _sidebarController = __webpack_require__(13);
 
-	var _logoutController2 = _interopRequireDefault(_logoutController);
+	var _sidebarController2 = _interopRequireDefault(_sidebarController);
 
-	var _routes = __webpack_require__(6);
+	var _routes = __webpack_require__(8);
 
 	var _routes2 = _interopRequireDefault(_routes);
 
@@ -74,7 +74,7 @@
 
 	var app = _angular2.default.module('SoToDo', [_angularRoute2.default]);
 
-	app.config(_routes2.default).controller('loginController', _loginController2.default).controller('signupController', _signupController2.default).controller('logoutController', _logoutController2.default);
+	app.config(_routes2.default).controller('authController', _authController2.default).controller('mainController', _mainController2.default).controller('sidebarController', _sidebarController2.default);
 
 /***/ },
 /* 1 */
@@ -32941,30 +32941,10 @@
 
 
 /***/ },
-/* 5 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = loginController;
-	function loginController($scope, $http) {
-	  $scope.email = "";
-	  $scope.password = "";
-
-	  $scope.login = function () {
-	    $http.post('/auth/login', { email: $scope.email, password: $scope.password }).then(function (response) {
-	      $scope.email = "";
-	      $scope.password = "";
-	      console.log(response);
-	    });
-	  };
-	}
-
-/***/ },
-/* 6 */
+/* 5 */,
+/* 6 */,
+/* 7 */,
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32975,18 +32955,22 @@
 	exports.default = routing;
 	function routing($routeProvider) {
 	  $routeProvider.when('/', {
-	    template: __webpack_require__(7)
+	    template: __webpack_require__(9),
+	    controller: 'authController'
+	  }).when('/app', {
+	    template: __webpack_require__(11),
+	    controller: 'mainController'
 	  });
 	}
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports) {
 
-	module.exports = "<div ng-controller=\"loginController\">\n  <input ng-model=\"email\"/>\n  <input type=\"password\" ng-model=\"password\"/>\n  <button ng-click=\"login()\">Submit </button>\n</div>\n\n<div ng-controller=\"signupController\">\n  <input ng-model=\"name\">\n  <input ng-model=\"email\">\n  <input type=\"password\" ng-model=\"signupPassword\">\n  <button ng-click=\"signup()\"> Submit </button>\n</div>\n";
+	module.exports = "<form ng-submit=\"login()\">\n  <input ng-model=\"loginEmail\"/>\n  <input type=\"password\" ng-model=\"loginPassword\"/>\n  <button>Submit </button>\n</form>\n<div ng-show=\"loginError\"> Invalid Email/Password</div>\n\n<form ng-submit=\"submit()\">\n  <input placeholder=\"name\" ng-model=\"signupName\">\n  <input placeholder=\"email\" ng-model=\"signupEmail\">\n  <input placeholder=\"password\" type=\"password\" ng-model=\"signupPassword\">\n  <button> Submit </button>\n</form>\n<div ng-show=\"signupError\"> Something went wrong on signup </div>\n";
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -32994,24 +32978,45 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.default = signupController;
-	function signupController($scope, $http) {
-	  $scope.email = "";
-	  $scope.password = "";
-	  $scope.name = "";
+	exports.default = authController;
+	function authController($scope, $http, $location) {
+	  $scope.signupEmail = "";
+	  $scope.signupPassword = "";
+	  $scope.signupName = "";
 
 	  $scope.signup = function () {
-	    $http.post('/auth/signup', { name: $scope.name, email: $scope.email, password: $scope.password }).then(function (response) {
-	      $scope.email = "";
-	      $scope.password = "";
-	      $scope.name = "";
-	      console.log(response);
+	    $http.post('/auth/signup', { name: $scope.signupName, email: $scope.signupEmail, password: $scope.signupPassword }).then(function (response) {
+	      $scope.signupEmail = "";
+	      $scope.signupPassword = "";
+	      $scope.signupName = "";
+	      $scope.signupError = false;
+
+	      if (response.data.success) $location.url('/app');else $scope.signupError = true;
+	    });
+	  };
+
+	  $scope.loginEmail = "";
+	  $scope.loginPassword = "";
+
+	  $scope.login = function () {
+	    $http.post('/auth/login', { email: $scope.loginEmail, password: $scope.loginPassword }).then(function (response) {
+	      $scope.loginEmail = "";
+	      $scope.loginPassword = "";
+	      $scope.loginError = false;
+
+	      if (response.data.success) $location.url('/app');else $scope.signupError = true;
 	    });
 	  };
 	}
 
 /***/ },
-/* 9 */
+/* 11 */
+/***/ function(module, exports) {
+
+	module.exports = "<div>\n  Welcome!\n</div>\n<form ng-submit=\"addTask()\">\n  <input placeholder=\"New Task\" ng-model=\"newTask\"/>\n  <button> Add </button>\n</form>\n<div ng-repeat ='task in tasks'>\n  <div ng-click=\"displayTask(taskid)\"> {{task.name}} </div>\n</div>\n\n<div ng-controller=\"sidebarController\" ng-show=\"viewTaskSidebar\">\n    {{task.name}}\n  <div ng-repeat=\"user in users\">\n    {{user.name}}\n  </div>\n</div>\n\n\n<div ng-controller=\"sidebarController\" ng-show=\"editTaskSidebar\">\n    {{task.name}}\n  <div ng-repeat=\"user in users\">\n    {{user.name}}\n  </div>\n</div>\n";
+
+/***/ },
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33019,14 +33024,26 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.default = logoutController;
-	function logoutController($scope, $http) {
-	  $scope.logout = function () {
-	    $http.post('/auth/logout').then(function (response) {
-	      console.log(response);
+	exports.default = mainController;
+	function mainController($scope, $http, $location, $rootScope) {
+	  $scope.tasks = [];
+	  $rootScope.currentTask = {};
+
+	  // pull tasks from server upon loading controller
+	  var loadTasks = function loadTasks() {
+	    $http.get('/api/users/tasks').then(function (data) {
+	      console.log(data);
 	    });
 	  };
+
+	  loadTasks();
 	}
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	"use strict";
 
 /***/ }
 /******/ ]);
