@@ -44,11 +44,23 @@ router.put('/complete/:status', (req, res) => {
 })
 
 router.get('/:taskid/users', (req, res) => {
-  Task.findWithOtherUsers(req.params.taskid, req.user.id)
+  Task.getWithOtherUsers(req.user.id, req.params.taskid)
+  .then(tasks => {
+    res.json(successWrapper(tasks))
+  })
+  .catch(err => {
+    res.json(failureWrapper(err))
+  })
 })
 
 router.get('/:taskid/complete/:status/users', (req, res) => {
-  Task.findWithOtherUsers(req.params.taskid, req.user.id, req.params.status)
+  Task.getWithOtherUsers(req.user.id, req.params.taskid, req.params.status)
+  .then(tasks => {
+    res.json(successWrapper(tasks))
+  })
+  .catch(err => {
+    res.json(failureWrapper(err))
+  })
 })
 
 router.get('/:taskid', (req, res) => {

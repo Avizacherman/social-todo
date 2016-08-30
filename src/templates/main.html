@@ -2,25 +2,25 @@
   Welcome!
 </div>
 <form ng-submit="addTask()">
-  <input placeholder="New Task" ng-model="newTask"/>
+  <input placeholder="New Task" ng-model="newItem"/>
   <button> Add </button>
 </form>
-<div ng-repeat ='item in tasks'>
-  <input type="checkbox" ng-model="item.does.properties.complete" ng-change="checkTask(item.does.properties.complete, item.task.id)"
-  <div ng-click="displayTask(taskid)"> {{item.task.name}} </div>
+<div ng-repeat ='item in items'>
+  <input type="checkbox" ng-model="item.does.properties.complete" ng-change="checkTask(item.does.properties.complete, item.task.id)"/>
+  <div ng-click="displayTask(item)"> {{item.task.name}} </div>
 </div>
-
-<div ng-controller="sidebarController" ng-show="viewTaskSidebar">
-    {{task.name}}
-  <div ng-repeat="user in users">
-    {{user.name}}
+<div ng-controller="sidebarController" >
+  <div ng-show="viewTaskSidebar">
+    {{currentItem[0].task.name}}
+    Completed: {{currentItem[0].youDid.properties.complete}}
+    <span ng-show="currentItem[0].youDid.properties.completedAt">
+      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}
+    </span>
   </div>
-</div>
-
-
-<div ng-controller="sidebarController" ng-show="editTaskSidebar">
-    {{task.name}}
-  <div ng-repeat="user in users">
-    {{user.name}}
+  <form ng-submit="updateTask(currentItem[0].task.id, currentItem[0].task.name)"  ng-show="editTaskSidebar">
+    <input ng-model="currentItem[0].task.name"/>
+  </form>
+  <div ng-repeat="item in currentItem">
+    <span ng-click="showUser(item.user.id)"> {{item.user.name}} </span>
   </div>
 </div>

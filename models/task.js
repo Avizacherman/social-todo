@@ -16,7 +16,7 @@ Task.create = function(userid, name){
         db.query(`
           MATCH (u:User) WHERE ID(u) = ${userid}
           MERGE (task:Task {name: "${name}"})
-          CREATE (task)<-[does:DOES {complete: false, startedAt: "${moment()}"}]-(u)
+          CREATE (task)<-[does:DOES {complete: false, startedAt: "${moment().format('YYYY-MM-DDTHH:mm:ss.sssZ')}"}]-(u)
           RETURN task, does
           `, (err, result) => {
           if(err)
@@ -37,7 +37,7 @@ Task.complete = function(userid, taskid){
       MATCH (task:Task)<-[does:DOES]-(u)
       WHERE ID(task) = ${taskid}
       SET does.complete = true
-      SET does.completedAt = "${moment()}"
+      SET does.completedAt = "${moment().format('YYYY-MM-DDTHH:mm:ss.sssZ')}"
       RETURN task, does
       `, (err, result) => {
       if(err)
@@ -89,14 +89,23 @@ Task.update = function(userId, taskId, newName){
   })
 }
 
-Task.findWithOtherUsers = function(userId, taskId, status){
-  status = typeof status === 'undefined' ? "" : "AND d.complete = " + status
+Task.getWithOtherUsers = function(userId, taskId, status){
+  status = typeof status === 'undefined' ? "" : "AND does.complete = " + status
   return new Promise((resolve, reject) => {
     db.query(`
-      MATCH (u:User)-[:DOES]->(t:Task)<-[d:DOES]-(users:Users)
-      WHERE ID(t) = ${taskId} AND ID(u) = ${userId} ${status}
-      RETURN users, task, does
-      `)
+      MATCH (u:User)-[youDid:DOES]->(task:Task)
+      WHERE ID(task) = ${taskId} AND ID(u) = ${userId} ${status}
+      WITH u, task, youDid
+      OPTIONAL MATCH (u)-[youDid:DOES]-(task)<-[does:DOES]-(user:User)
+      RETURN task, does, user, youDid
+      `, (err, result) => {
+      if(err){
+      console.log(err)
+        reject(err)
+      }
+      else
+        resolve(result)
+    })
   })
 }
 

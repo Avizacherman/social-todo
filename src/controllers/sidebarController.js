@@ -1,5 +1,5 @@
-export default function sidebarController($scope, $http, $location, $rootScope){
-
+export default function sidebarController($scope, $http, $location){
+  console.log($scope.currentItem)
   $scope.updateTask = function(newName, id){
     $.put('/api/tasks/edit/' + id, {newName})
     .then(response => {

@@ -54,19 +54,19 @@
 
 	var _angularRoute2 = _interopRequireDefault(_angularRoute);
 
-	var _authController = __webpack_require__(10);
+	var _authController = __webpack_require__(5);
 
 	var _authController2 = _interopRequireDefault(_authController);
 
-	var _mainController = __webpack_require__(12);
+	var _mainController = __webpack_require__(6);
 
 	var _mainController2 = _interopRequireDefault(_mainController);
 
-	var _sidebarController = __webpack_require__(13);
+	var _sidebarController = __webpack_require__(9);
 
 	var _sidebarController2 = _interopRequireDefault(_sidebarController);
 
-	var _routes = __webpack_require__(8);
+	var _routes = __webpack_require__(10);
 
 	var _routes2 = _interopRequireDefault(_routes);
 
@@ -32941,36 +32941,7 @@
 
 
 /***/ },
-/* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = routing;
-	function routing($routeProvider) {
-	  $routeProvider.when('/', {
-	    template: __webpack_require__(9),
-	    controller: 'authController'
-	  }).when('/app', {
-	    template: __webpack_require__(11),
-	    controller: 'mainController'
-	  });
-	}
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	module.exports = "<form ng-submit=\"login()\">\n  <input ng-model=\"loginEmail\"/>\n  <input type=\"password\" ng-model=\"loginPassword\"/>\n  <button>Submit </button>\n</form>\n<div ng-show=\"loginError\"> Invalid Email/Password</div>\n\n<form ng-submit=\"signup()\">\n  <input placeholder=\"name\" ng-model=\"signupName\">\n  <input placeholder=\"email\" ng-model=\"signupEmail\">\n  <input placeholder=\"password\" type=\"password\" ng-model=\"signupPassword\">\n  <button> Submit </button>\n</form>\n<div ng-show=\"signupError\"> Something went wrong on signup </div>\n";
-
-/***/ },
-/* 10 */
+/* 5 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -33010,13 +32981,7 @@
 	}
 
 /***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-	module.exports = "<div>\n  Welcome!\n</div>\n<form ng-submit=\"addTask()\">\n  <input placeholder=\"New Task\" ng-model=\"newTask\"/>\n  <button> Add </button>\n</form>\n<div ng-repeat ='item in tasks'>\n  <input type=\"checkbox\" ng-model=\"item.does.properties.complete\" ng-change=\"checkTask(item.does.properties.complete, item.task.id)\"\n  <div ng-click=\"displayTask(taskid)\"> {{item.task.name}} </div>\n</div>\n\n<div ng-controller=\"sidebarController\" ng-show=\"viewTaskSidebar\">\n    {{task.name}}\n  <div ng-repeat=\"user in users\">\n    {{user.name}}\n  </div>\n</div>\n\n\n<div ng-controller=\"sidebarController\" ng-show=\"editTaskSidebar\">\n    {{task.name}}\n  <div ng-repeat=\"user in users\">\n    {{user.name}}\n  </div>\n</div>\n";
-
-/***/ },
-/* 12 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33026,7 +32991,7 @@
 	});
 	exports.default = mainController;
 
-	var _lodash = __webpack_require__(14);
+	var _lodash = __webpack_require__(7);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -33034,18 +32999,18 @@
 
 	// the data.data is a redundency from the api wrappers. This is intentional, to prevent mutation of
 	// the data object to begin with when adding success values
-	function mainController($scope, $http, $location, $rootScope) {
-	  $scope.tasks = [];
-	  $scope.newTask = "";
+	function mainController($scope, $http, $location) {
+	  $scope.items = [];
+	  $scope.newItem = "";
 	  $scope.errorMsg = false;
-	  $rootScope.currentTask = {};
+	  $scope.currentItem = {};
 
 	  // pull tasks from server upon loading controller
 	  var loadTasks = function loadTasks() {
 	    $http.get('/api/users/tasks').then(function (response) {
 	      if (response.data.success) {
 	        $scope.errorMsg = false;
-	        $scope.tasks = response.data.data;
+	        $scope.items = response.data.data;
 	      } else {
 	        $scope.errorMsg = response.data.msg;
 	      }
@@ -33053,21 +33018,32 @@
 	  };
 
 	  $scope.addTask = function () {
-	    $http.post('/api/tasks', { name: $scope.newTask }).then(function (response) {
-	      console.log(response);
+	    $http.post('/api/tasks', { name: $scope.newItem }).then(function (response) {
 	      if (response.data.success) {
-	        $scope.newTask = "";
-	        $scope.tasks.push(response.data.data);
+	        $scope.newItem = "";
+	        $scope.items.push(response.data.data);
 	      } else {
 	        $scope.errorMsg = response.data.msg;
 	      }
 	    }).catch(function (err) {});
 	  };
 
+	  $scope.displayTask = function (item) {
+	    $http.get('/api/tasks/' + item.task.id + '/users').then(function (response) {
+	      if (response.data.success) {
+	        $scope.currentItem = response.data.data;
+	        $scope.viewTaskSidebar = true;
+	      } else console.log(response.data.msg);
+	    }).catch(function (err) {
+	      console.log(err);
+	    });
+	  };
+
 	  $scope.checkTask = function (status, id) {
 	    // console.log($scope.task[_.findIndex($scope.tasks, {t: {id}})])
 	    $http.put('/api/tasks/complete/' + status, { taskid: id }).then(function (response) {
 	      if (response.data.success) {
+	        debugger;
 	        // $scope.task[_.findIndex($scope.tasks, {t: {id}})] = response.data.data
 	      } else {}
 	    });
@@ -33081,28 +33057,7 @@
 	}
 
 /***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = sidebarController;
-	function sidebarController($scope, $http, $location, $rootScope) {
-
-	  $scope.updateTask = function (newName, id) {
-	    $.put('/api/tasks/edit/' + id, { newName: newName }).then(function (response) {
-	      if (response.data.success) {
-	        $rootScope.tasks[_.findIndex($rootScope.tasks, { t: { id: id } })] = response.data.data;
-	      } else {}
-	    });
-	  };
-	}
-
-/***/ },
-/* 14 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -49839,10 +49794,10 @@
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(15)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(8)(module)))
 
 /***/ },
-/* 15 */
+/* 8 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -49856,6 +49811,59 @@
 		return module;
 	}
 
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = sidebarController;
+	function sidebarController($scope, $http, $location) {
+	  console.log($scope.currentItem);
+	  $scope.updateTask = function (newName, id) {
+	    $.put('/api/tasks/edit/' + id, { newName: newName }).then(function (response) {
+	      if (response.data.success) {
+	        $rootScope.tasks[_.findIndex($rootScope.tasks, { t: { id: id } })] = response.data.data;
+	      } else {}
+	    });
+	  };
+	}
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = routing;
+	function routing($routeProvider) {
+	  $routeProvider.when('/', {
+	    template: __webpack_require__(11),
+	    controller: 'authController'
+	  }).when('/app', {
+	    template: __webpack_require__(12),
+	    controller: 'mainController'
+	  });
+	}
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	module.exports = "<form ng-submit=\"login()\">\n  <input ng-model=\"loginEmail\"/>\n  <input type=\"password\" ng-model=\"loginPassword\"/>\n  <button>Submit </button>\n</form>\n<div ng-show=\"loginError\"> Invalid Email/Password</div>\n\n<form ng-submit=\"signup()\">\n  <input placeholder=\"name\" ng-model=\"signupName\">\n  <input placeholder=\"email\" ng-model=\"signupEmail\">\n  <input placeholder=\"password\" type=\"password\" ng-model=\"signupPassword\">\n  <button> Submit </button>\n</form>\n<div ng-show=\"signupError\"> Something went wrong on signup </div>\n";
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	module.exports = "<div>\n  Welcome!\n</div>\n<form ng-submit=\"addTask()\">\n  <input placeholder=\"New Task\" ng-model=\"newItem\"/>\n  <button> Add </button>\n</form>\n<div ng-repeat ='item in items'>\n  <input type=\"checkbox\" ng-model=\"item.does.properties.complete\" ng-change=\"checkTask(item.does.properties.complete, item.task.id)\"/>\n  <div ng-click=\"displayTask(item)\"> {{item.task.name}} </div>\n</div>\n<div ng-controller=\"sidebarController\" >\n  <div ng-show=\"viewTaskSidebar\">\n    {{currentItem[0].task.name}}\n    Completed: {{currentItem[0].youDid.properties.complete}}\n    <span ng-show=\"currentItem[0].youDid.properties.completedAt\">\n      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}\n    </span>\n  </div>\n  <form ng-submit=\"updateTask(currentItem[0].task.id, currentItem[0].task.name)\"  ng-show=\"editTaskSidebar\">\n    <input ng-model=\"currentItem[0].task.name\"/>\n  </form>\n  <div ng-repeat=\"item in currentItem\">\n    <span ng-click=\"showUser(item.user.id)\"> {{item.user.name}} </span>\n  </div>\n</div>\n";
 
 /***/ }
 /******/ ]);
