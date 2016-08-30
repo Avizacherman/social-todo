@@ -25,7 +25,6 @@ module.exports = function(passport){
   })
 
   router.get('/logout', (req, res) => {
-    console.log(req.user)
     req.logout()
     res.redirect('/')
   })

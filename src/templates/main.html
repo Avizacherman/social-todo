@@ -5,8 +5,8 @@
   <input placeholder="New Task" ng-model="newTask"/>
   <button> Add </button>
 </form>
-<div ng-repeat ='task in tasks'>
-  <div ng-click="displayTask(taskid)"> {{task.name}} </div>
+<div ng-repeat ='item in tasks'>
+  <div ng-click="displayTask(taskid)"> {{item.task.name}} </div>
 </div>
 
 <div ng-controller="sidebarController" ng-show="viewTaskSidebar">

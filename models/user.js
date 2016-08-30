@@ -3,18 +3,11 @@ var db = require('../config/db')
 var Model = require('./model')
 
 const User = new Model('User')
-
-function sanitize(user){
-  delete user.password
-  return user
-}
-
-User.findById = function(id){
-  this.findById(id)
-  .then(user => {
-    return sanitize(user)
-  })
-}
+//
+// function sanitize(user){
+//   delete user.password
+//   return user
+// }
 
 User.create = function(user){
   return new Promise( (resolve, reject) => {
@@ -57,7 +50,7 @@ User.validate = function(email, password){
       else if(!bcrypt.compareSync(password, user.password))
         resolve({success: false, msg: 'PASSWORD DOES NOT MATCH'})
       else
-        resolve({success: true, user: sanitize(user)})
+        resolve({success: true, user})
     })
     .catch(err => {
       reject(err)
@@ -67,15 +60,15 @@ User.validate = function(email, password){
 
 User.getTasks = function(userid, status){
   // if status is blank replace it with "" for use in the query, otherwise, add a search for the status
-  status = typeof status === 'undefined' ? "" : "d.complete = " + status
+  status = typeof status === 'undefined' ? "" : "AND d.complete = " + status
   return new Promise((resolve, reject) => {
     // Cypher Query - Find the User who's id matches the inputed id, it's related tasks where
     // the relationship is of the type past in status (should be incomplete or complete) and
     // all the associated tasks, then return them all.
     db.query(`
-    MATCH(u:User)-[d:DOES]->(t:Task)
+    MATCH(u:User)-[does:DOES]->(task:Task)
     WHERE ID(u) = ${userid} ${status}
-    RETURN t, d
+    RETURN task, does
     `, (err, result) => {
       if(err)
         reject(err)
@@ -89,9 +82,9 @@ User.getTask = function(userid, taskid){
   return new Promise((resolve, reject) => {
     // Cypher Query - Find a sepcific task if (and only if) it's related to the user
     db.query(`
-    MATCH(u:User)-[d:DOES]->(t:Task)
-    WHERE ID(u) = ${userid} AND ID(t) = "${taskid}"
-    RETURN t, d
+    MATCH(u:User)-[does:DOES]->(task:Task)
+    WHERE ID(u) = ${userid} AND ID(task) = "${taskid}"
+    RETURN task, does
     `, (err, result) => {
       if(err)
         reject(err)
@@ -100,5 +93,22 @@ User.getTask = function(userid, taskid){
     })
   })
 }
+
+User.findTask = function(userid, taskName){
+  return new Promise((resolve, reject) => {
+    // Cypher Query - Find a sepcific task if (and only if) it's related to the user
+    db.query(`
+    MATCH(u:User)-[does:DOES]->(task:Task)
+    WHERE ID(u) = ${userid} AND task.name = "${taskName}"
+    RETURN task, does
+    `, (err, result) => {
+      if(err)
+        reject(err)
+      else
+        resolve(result)
+    })
+  })
+}
+
 
 module.exports = User

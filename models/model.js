@@ -20,19 +20,11 @@ Model.prototype.findOne = function(searchObj){
 
 Model.prototype.findById = function(id){
   return new Promise( (resolve, reject) => {
-    db.read(id, (err, result) => {
+    db.query(`MATCH (u:User) WHERE ID(u) = ${id} RETURN u`, (err, user) =>{
       if(err)
         reject(err)
-      else {
-        db.readLabels(result, (err, labels) => {
-          if(err)
-            reject(err)
-          else if(labels.indexOf(this.label) > 0)
-            reject({msg: `NODE WITH ID ${id} IS NOT A ${this.label}`})
-          else
-            resolve(result)
-        })
-      }
+      else
+        resolve(user[0])
     })
   })
 }
@@ -47,5 +39,6 @@ Model.prototype.findAll = function(){
     })
   })
 }
+
 
 module.exports = Model

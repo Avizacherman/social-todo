@@ -2,19 +2,15 @@ var LocalStrategy = require('passport-local').Strategy
 
 var User = require('../models/user')
 
-
-
 module.exports = function(passport) {
 
   passport.serializeUser(function(user, done) {
     done(null, user.id)
-    return null
   })
 
   passport.deserializeUser(function(id, done) {
-    User.findById(id).then(function(user) {
+    User.findById(id).then( user => {
       done(null, user)
-      return null
     })
   })
 

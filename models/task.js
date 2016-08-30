@@ -6,23 +6,23 @@ var moment = require('moment')
 
 const Task = new Model('Task')
 
-Task.create = function(user, name){
+Task.create = function(userid, name){
   return new Promise((resolve, reject) => {
-    User.getTask(user.id, name)
+    User.findTask(userid, name)
     .then( result => {
-      if(result)
+      if(result.length > 0)
         reject({msg: "USER ALREADY HAS THIS TASK ON THEIR LIST"})
       else {
         db.query(`
-          MATCH (u:User) WHERE ID(u) = ${user.id}
-          MERGE (t:Task {name: ${name}})
-          CREATE (t)<-[:DOES {complete: false, startedAt: ${moment()}}]-(u)
-          RETURN t
+          MATCH (u:User) WHERE ID(u) = ${userid}
+          MERGE (task:Task {name: "${name}"})
+          CREATE (t)<-[does:DOES {complete: false, startedAt: "${moment()}"}]-(u)
+          RETURN task, does
           `, (err, result) => {
           if(err)
             reject(err)
           else
-            resolve(result)
+            resolve(result[0])
         })
       }
     })

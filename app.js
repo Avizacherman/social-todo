@@ -11,6 +11,8 @@ var passport = require('passport')
 var index = require('./routes/index')
 
 var users = require('./routes/api/users/index')
+var tasks = require('./routes/api/tasks/index')
+
 var auth = require('./routes/auth')
 var app = express()
 
@@ -34,6 +36,8 @@ require('./config/passport.js')(passport)
 app.use('/', index)
 //api routes
 app.use('/api/users', users)
+app.use('/api/tasks', tasks)
+
 app.use('/auth', auth(passport))
 
 // catch 404 and forward to error handler

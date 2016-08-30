@@ -4,10 +4,25 @@ var authenticator = require('../../../lib/authenticator')
 
 var Task = require('../../../models/task')
 
-router.user(authenticator)
+function failureWrapper(response, msg){
+  return {data: response, msg, success: false}
+}
+
+function successWrapper(response, msg){
+  return {data: response, msg, success: true}
+}
+
+router.use(authenticator)
 
 router.post('/', (req, res) => {
-
+  console.log(req.user)
+  Task.create(req.user.id, req.body.name)
+  .then(task => {
+    res.json(successWrapper(task))
+  })
+  .catch(err => {
+    res.json(failureWrapper(err))
+  })
 })
 
 router.put('/edit/:taskid', (req, res) =>{
@@ -27,10 +42,10 @@ router.get('/:taskid/:status/users', (req, res) => {
 router.get('/:taskid', (req, res) => {
   Task.findById(req.params.taskid)
   .then(task => {
-    res.json(jsonWrapper.success(task, ""))
+    res.json(successWrapper(task, ""))
   })
   .catch(err => {
-    res.json(jsonWrapper.failure(err, "Something went wrong"))
+    res.json(failureWrapper(err, "Something went wrong"))
   })
 })
 

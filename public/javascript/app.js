@@ -33013,7 +33013,7 @@
 /* 11 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\n  Welcome!\n</div>\n<form ng-submit=\"addTask()\">\n  <input placeholder=\"New Task\" ng-model=\"newTask\"/>\n  <button> Add </button>\n</form>\n<div ng-repeat ='task in tasks'>\n  <div ng-click=\"displayTask(taskid)\"> {{task.name}} </div>\n</div>\n\n<div ng-controller=\"sidebarController\" ng-show=\"viewTaskSidebar\">\n    {{task.name}}\n  <div ng-repeat=\"user in users\">\n    {{user.name}}\n  </div>\n</div>\n\n\n<div ng-controller=\"sidebarController\" ng-show=\"editTaskSidebar\">\n    {{task.name}}\n  <div ng-repeat=\"user in users\">\n    {{user.name}}\n  </div>\n</div>\n";
+	module.exports = "<div>\n  Welcome!\n</div>\n<form ng-submit=\"addTask()\">\n  <input placeholder=\"New Task\" ng-model=\"newTask\"/>\n  <button> Add </button>\n</form>\n<div ng-repeat ='item in tasks'>\n  <div ng-click=\"displayTask(taskid)\"> {{item.task.name}} </div>\n</div>\n\n<div ng-controller=\"sidebarController\" ng-show=\"viewTaskSidebar\">\n    {{task.name}}\n  <div ng-repeat=\"user in users\">\n    {{user.name}}\n  </div>\n</div>\n\n\n<div ng-controller=\"sidebarController\" ng-show=\"editTaskSidebar\">\n    {{task.name}}\n  <div ng-repeat=\"user in users\">\n    {{user.name}}\n  </div>\n</div>\n";
 
 /***/ },
 /* 12 */
@@ -33025,15 +33025,40 @@
 	  value: true
 	});
 	exports.default = mainController;
+	// the data.data is a redundency from the api wrappers. This is intentional, to prevent mutation of
+	// the data object to begin with when adding success values
 	function mainController($scope, $http, $location, $rootScope) {
 	  $scope.tasks = [];
+	  $scope.newTask = "";
+	  $scope.errorMsg = false;
 	  $rootScope.currentTask = {};
 
 	  // pull tasks from server upon loading controller
 	  var loadTasks = function loadTasks() {
-	    $http.get('/api/users/tasks').then(function (data) {
-	      console.log(data);
+	    $http.get('/api/users/tasks').then(function (response) {
+	      if (response.data.success) {
+	        $scope.errorMsg = false;
+	        $scope.tasks = response.data.data;
+	      } else {
+	        $scope.errorMsg = response.data.msg;
+	      }
 	    });
+	  };
+
+	  $scope.addTask = function () {
+	    $http.post('/api/tasks', { name: $scope.newTask }).then(function (response) {
+	      console.log(response);
+	      if (response.data.success) {
+	        $scope.newTask = "";
+	        $scope.tasks.push(response.data.data);
+	      } else {
+	        $scope.errorMsg = response.data.msg;
+	      }
+	    }).catch(function (err) {});
+	  };
+
+	  $scope.clearError = function () {
+	    $scope.errorMsg = false;
 	  };
 
 	  loadTasks();
@@ -33044,6 +33069,12 @@
 /***/ function(module, exports) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = sidebarController;
+	function sidebarController($scope, $http, $location, $rootScope) {}
 
 /***/ }
 /******/ ]);
