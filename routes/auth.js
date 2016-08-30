@@ -32,6 +32,7 @@ module.exports = function(passport){
   router.post('/signup', (req, res, next) => {
     User.create(req.body)
     .then(user => {
+      console.log(user)
       passport.authenticate('local', (err, user) => {
         if(err)
           res.json(jsonWrapper.failure(err, "Unable to log in"))

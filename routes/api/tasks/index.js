@@ -15,7 +15,6 @@ function successWrapper(response, msg){
 router.use(authenticator)
 
 router.post('/', (req, res) => {
-  console.log(req.user)
   Task.create(req.user.id, req.body.name)
   .then(task => {
     res.json(successWrapper(task))
@@ -26,16 +25,29 @@ router.post('/', (req, res) => {
 })
 
 router.put('/edit/:taskid', (req, res) =>{
-
+  // Task.update(req.user.id, req.body.taskid, req.body.newName)
+  // .then()
 })
 
-router.put('/complete/:complete/:taskid')
+router.put('/complete/:status', (req, res) => {
+  if(req.params.status === 'true'){
+    var taskPromise = Task.complete(req.user.id, req.body.taskid)
+  } else {
+    var taskPromise = Task.incomplete(req.user.id, req.body.taskid)
+  }
+  taskPromise.then(task => {
+    res.json(successWrapper(task))
+  })
+  .catch(err => {
+    res.json(failureWrapper(err))
+  })
+})
 
 router.get('/:taskid/users', (req, res) => {
   Task.findWithOtherUsers(req.params.taskid, req.user.id)
 })
 
-router.get('/:taskid/:status/users', (req, res) => {
+router.get('/:taskid/complete/:status/users', (req, res) => {
   Task.findWithOtherUsers(req.params.taskid, req.user.id, req.params.status)
 })
 

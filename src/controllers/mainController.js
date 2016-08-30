@@ -1,3 +1,4 @@
+import _ from 'lodash'
 // the data.data is a redundency from the api wrappers. This is intentional, to prevent mutation of
 // the data object to begin with when adding success values
 export default function mainController($scope, $http, $location, $rootScope){
@@ -32,6 +33,19 @@ export default function mainController($scope, $http, $location, $rootScope){
     })
     .catch(err => {
 
+    })
+  }
+
+
+
+  $scope.checkTask = function(status, id){
+    // console.log($scope.task[_.findIndex($scope.tasks, {t: {id}})])
+    $http.put('/api/tasks/complete/' + status, {taskid: id})
+    .then(response => {
+      if(response.data.success){
+        // $scope.task[_.findIndex($scope.tasks, {t: {id}})] = response.data.data
+      } else {
+      }
     })
   }
 

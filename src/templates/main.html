@@ -6,6 +6,7 @@
   <button> Add </button>
 </form>
 <div ng-repeat ='item in tasks'>
+  <input type="checkbox" ng-model="item.does.properties.complete" ng-change="checkTask(item.does.properties.complete, item.task.id)"
   <div ng-click="displayTask(taskid)"> {{item.task.name}} </div>
 </div>
 
