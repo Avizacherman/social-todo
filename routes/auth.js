@@ -25,7 +25,7 @@ module.exports = function(passport){
          if(err)
            res.json(err)
          else
-           res.json({success: true, user})
+           res.json(successWrapper(user, "Succesfully logged in"))
         })
       }
     })(req, res, next)
