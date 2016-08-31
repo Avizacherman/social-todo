@@ -12,9 +12,10 @@
     <span ng-show="currentItem[0].youDid.properties.completedAt">
       Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}
     </span>
-  </div>
-  <h3> Other People with this Task <h3>
-  <div ng-repeat="item in currentItem">
-    <span ng-click="showUser(item.user.id)"> {{item.user.name}} </span>
+    <h3> Other People with this Task <h3>
+    <div ng-repeat="item in currentItem">
+      <span ng-click="showUser(item.user.id)"> {{item.user.name}} </span>
+    </div>
+
   </div>
 </div>

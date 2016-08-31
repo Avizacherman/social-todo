@@ -66,9 +66,9 @@ User.getTasks = function(userid, status){
     // the relationship is of the type past in status (should be incomplete or complete) and
     // all the associated tasks, then return them all.
     db.query(`
-    MATCH(u:User)-[does:DOES]->(task:Task)
-    WHERE ID(u) = ${userid} ${status}
-    RETURN task, does
+    MATCH(self:User)-[does:DOES]->(task:Task)
+    WHERE ID(self) = ${userid} ${status}
+    RETURN task, does, self
     `, (err, result) => {
       if(err)
         reject(err)

@@ -49937,8 +49937,11 @@
 	        $location.url('/');
 	      }
 	      if (response.data.success) {
+	        console.log(response);
+
 	        $scope.errorMsg = false;
 	        $scope.items = response.data.data;
+	        $scope.name = response.data.data[0].self.name;
 	      } else {
 	        console.log(response);
 
@@ -50001,7 +50004,7 @@
 /* 14 */
 /***/ function(module, exports) {
 
-	module.exports = "<h2>\n  {{name}}'s List\n</h2>\n<div ng-repeat ='item in items'>\n  <div ng-click=\"displayTask(item.task.id)\"> {{item.task.name}} </div>\n</div>\n<div ng-controller=\"sidebarController\" >\n  <div ng-show=\"viewTaskSidebar\">\n    <strong> Task: </strong> <span> {{currentItem[0].task.name}} </span>\n\n    Completed: {{currentItem[0].youDid.properties.complete}}\n    <span ng-show=\"currentItem[0].youDid.properties.completedAt\">\n      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}\n    </span>\n  </div>\n  <h3> Other People with this Task <h3>\n  <div ng-repeat=\"item in currentItem\">\n    <span ng-click=\"showUser(item.user.id)\"> {{item.user.name}} </span>\n  </div>\n</div>\n";
+	module.exports = "<h2>\n  {{name}}'s List\n</h2>\n<div ng-repeat ='item in items'>\n  <div ng-click=\"displayTask(item.task.id)\"> {{item.task.name}} </div>\n</div>\n<div ng-controller=\"sidebarController\" >\n  <div ng-show=\"viewTaskSidebar\">\n    <strong> Task: </strong> <span> {{currentItem[0].task.name}} </span>\n\n    Completed: {{currentItem[0].youDid.properties.complete}}\n    <span ng-show=\"currentItem[0].youDid.properties.completedAt\">\n      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}\n    </span>\n    <h3> Other People with this Task <h3>\n    <div ng-repeat=\"item in currentItem\">\n      <span ng-click=\"showUser(item.user.id)\"> {{item.user.name}} </span>\n    </div>\n\n  </div>\n</div>\n";
 
 /***/ }
 /******/ ]);
