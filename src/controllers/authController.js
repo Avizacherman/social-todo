@@ -1,9 +1,12 @@
 export default function authController($scope, $http, $location, $rootScope){
   function init(){
-    if(_userid){
-      $location.url('/app')
+    if(_user){
+      $location.url('/')
     }
   }
+
+
+  $rootScope.user = {}
 
   $scope.signupEmail = ""
   $scope.signupPassword = ""
@@ -18,6 +21,7 @@ export default function authController($scope, $http, $location, $rootScope){
       $scope.signupError = false
 
       if(response.data.success){
+        $rootScope.myName = response.data.user.name
         $rootScope.myId = response.data.user.id
         $location.url('/app')
       }
@@ -37,6 +41,7 @@ export default function authController($scope, $http, $location, $rootScope){
       $scope.loginPassword = ""
       $scope.loginError = false
       if(response.data.success){
+        $rootScope.myName = response.data.user.name
         $rootScope.myId = response.data.user.id
         $location.url('/app')
       }
@@ -44,6 +49,4 @@ export default function authController($scope, $http, $location, $rootScope){
         $scope.loginError = true
     })
   }
-  
-  init()
 }

@@ -4,9 +4,7 @@
     <title>{{title}}</title>
     <script>
     //bootstrapping userID
-    {{#if user}}
-    var _userid = {{user.id}}
-    {{/if}}
+    var _user = JSON.parse(JSON.stringify({{{user}}}))
     </script>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="/javascript/app.js"></script>

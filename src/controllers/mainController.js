@@ -10,6 +10,7 @@ export default function mainController($scope, $http, $location, $rootScope){
   $scope.newItem = ""
   $scope.errorMsg = false
   $rootScope.currentItem = {}
+  $scope.name = _user.name || $rootScope.myName 
 
   // pull tasks from server upon loading controller
   var init = function(){

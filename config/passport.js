@@ -2,6 +2,11 @@ var LocalStrategy = require('passport-local').Strategy
 
 var User = require('../models/user')
 
+function sanitize(user){
+  delete user.password
+  return user
+}
+
 module.exports = function(passport) {
 
   passport.serializeUser(function(user, done) {
@@ -10,7 +15,7 @@ module.exports = function(passport) {
 
   passport.deserializeUser(function(id, done) {
     User.findById(id).then( user => {
-      done(null, user)
+      done(null, sanitize(user))
     })
   })
 

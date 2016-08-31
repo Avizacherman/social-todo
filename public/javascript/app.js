@@ -32956,10 +32956,12 @@
 	exports.default = authController;
 	function authController($scope, $http, $location, $rootScope) {
 	  function init() {
-	    if (_userid) {
-	      $location.url('/app');
+	    if (_user) {
+	      $location.url('/');
 	    }
 	  }
+
+	  $rootScope.user = {};
 
 	  $scope.signupEmail = "";
 	  $scope.signupPassword = "";
@@ -32973,6 +32975,7 @@
 	      $scope.signupError = false;
 
 	      if (response.data.success) {
+	        $rootScope.myName = response.data.user.name;
 	        $rootScope.myId = response.data.user.id;
 	        $location.url('/app');
 	      } else $scope.signupError = true;
@@ -32989,13 +32992,12 @@
 	      $scope.loginPassword = "";
 	      $scope.loginError = false;
 	      if (response.data.success) {
+	        $rootScope.myName = response.data.user.name;
 	        $rootScope.myId = response.data.user.id;
 	        $location.url('/app');
 	      } else $scope.loginError = true;
 	    });
 	  };
-
-	  init();
 	}
 
 /***/ },
@@ -33026,6 +33028,7 @@
 	  $scope.newItem = "";
 	  $scope.errorMsg = false;
 	  $rootScope.currentItem = {};
+	  $scope.name = _user.name || $rootScope.myName;
 
 	  // pull tasks from server upon loading controller
 	  var init = function init() {
@@ -49897,7 +49900,7 @@
 	  };
 
 	  $scope.showUser = function (userid) {
-	    if (userid === (_userid || $rootScope.myId)) $location.url('/app');else $location.url('/app/user/' + userid);
+	    if (userid === (_user.id || $rootScope.myId)) $location.url('/app');else $location.url('/app/user/' + userid);
 	  };
 	}
 
@@ -49986,19 +49989,19 @@
 /* 12 */
 /***/ function(module, exports) {
 
-	module.exports = "<form ng-submit=\"login()\">\n  <input ng-model=\"loginEmail\"/>\n  <input type=\"password\" ng-model=\"loginPassword\"/>\n  <button>Submit </button>\n</form>\n<div ng-show=\"loginError\"> Invalid Email/Password</div>\n\n<form ng-submit=\"signup()\">\n  <input placeholder=\"name\" ng-model=\"signupName\">\n  <input placeholder=\"email\" ng-model=\"signupEmail\">\n  <input placeholder=\"password\" type=\"password\" ng-model=\"signupPassword\">\n  <button> Submit </button>\n</form>\n<div ng-show=\"signupError\"> Something went wrong on signup </div>\n";
+	module.exports = "<h3> Login </h3>\n<form ng-submit=\"login()\">\n  <input placeholder=\"email\" ng-model=\"loginEmail\"/>\n  <input placeholder=\"password\" type=\"password\" ng-model=\"loginPassword\"/>\n  <button>Submit </button>\n</form>\n<div ng-show=\"loginError\"> Invalid Email/Password</div>\n\n<h3> Signup </h3>\n<form ng-submit=\"signup()\">\n  <input placeholder=\"name\" ng-model=\"signupName\">\n  <input placeholder=\"email\" ng-model=\"signupEmail\">\n  <input placeholder=\"password\" type=\"password\" ng-model=\"signupPassword\">\n  <button> Submit </button>\n</form>\n<div ng-show=\"signupError\"> Something went wrong on signup </div>\n";
 
 /***/ },
 /* 13 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\n  Welcome!\n</div>\n<form ng-submit=\"addTask()\">\n  <input placeholder=\"New Task\" ng-model=\"newItem\"/>\n  <button> Add </button>\n</form>\n<div ng-repeat ='item in items'>\n  <input type=\"checkbox\" ng-model=\"item.does.properties.complete\" ng-change=\"checkTask(item.does.properties.complete, item.task.id)\"/>\n  <div ng-click=\"displayTask(item.task.id)\"> {{item.task.name}} </div>\n</div>\n<div ng-controller=\"sidebarController\" >\n  <div ng-show=\"viewTaskSidebar\">\n    <div ng-show=\"!editItem\" ng-click=\"showInput()\"> {{currentItem[0].task.name}} </div>\n    <form ng-submit=\"updateTask(currentItem[0].task.id, currentItem[0].task.name)\"  ng-show=\"editItem\">\n      <input ng-model=\"currentItem[0].task.name\"/>\n    </form>\n    Completed: {{currentItem[0].youDid.properties.complete}}\n    <span ng-show=\"currentItem[0].youDid.properties.completedAt\">\n      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}\n    </span>\n  </div>\n\n  <div ng-repeat=\"item in currentItem\">\n    <div ng-click=\"showUser(item.user.id)\"> {{item.user.name}} </div>\n  </div>\n</div>\n";
+	module.exports = "<h2> Welcome {{name}} </h2>\n\n<div>\n  <h4> Add New Task </h4>\n  <form ng-submit=\"addTask()\">\n    <input placeholder=\"New Task\" ng-model=\"newItem\"/>\n    <button> Add </button>\n  </form>\n  <h4> Current Tasks </h4>\n  <div ng-repeat ='item in items'>\n    <input type=\"checkbox\" ng-model=\"item.does.properties.complete\" ng-change=\"checkTask(item.does.properties.complete, item.task.id)\"/>\n    <div ng-click=\"displayTask(item.task.id)\"> {{item.task.name}} </div>\n  </div>\n</div>\n<div ng-controller=\"sidebarController\" >\n  <div ng-show=\"viewTaskSidebar\">\n    <strong> Task: </strong> <span ng-show=\"!editItem\" ng-click=\"showInput()\"> {{currentItem[0].task.name}} </span>\n    <form ng-submit=\"updateTask(currentItem[0].task.id, currentItem[0].task.name)\"  ng-show=\"editItem\">\n      <input ng-model=\"currentItem[0].task.name\"/>\n    </form>\n    Completed: {{currentItem[0].youDid.properties.complete}}\n    <span ng-show=\"currentItem[0].youDid.properties.completedAt\">\n      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}\n    </span>\n    <h3> Other People with this Task <h3>\n    <div ng-repeat=\"item in currentItem\">\n      <div ng-click=\"showUser(item.user.id)\"> {{item.user.name}} </div>\n    </div>\n  </div>\n</div>\n";
 
 /***/ },
 /* 14 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\n  {{user.name}}\n</div>\n<div ng-repeat ='item in items'>\n  <div ng-click=\"displayTask(item.task.id)\"> {{item.task.name}} </div>\n</div>\n<div ng-controller=\"sidebarController\" >\n  <div ng-show=\"viewTaskSidebar\">\n    Completed: {{currentItem[0].youDid.properties.complete}}\n    <span ng-show=\"currentItem[0].youDid.properties.completedAt\">\n      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}\n    </span>\n  </div>\n\n  <div ng-repeat=\"item in currentItem\">\n    <span ng-click=\"showUser(item.user.id)\"> {{item.user.name}} </span>\n  </div>\n</div>\n";
+	module.exports = "<h2>\n  {{name}}'s List\n</h2>\n<div ng-repeat ='item in items'>\n  <div ng-click=\"displayTask(item.task.id)\"> {{item.task.name}} </div>\n</div>\n<div ng-controller=\"sidebarController\" >\n  <div ng-show=\"viewTaskSidebar\">\n    <strong> Task: </strong> <span> {{currentItem[0].task.name}} </span>\n\n    Completed: {{currentItem[0].youDid.properties.complete}}\n    <span ng-show=\"currentItem[0].youDid.properties.completedAt\">\n      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}\n    </span>\n  </div>\n  <h3> Other People with this Task <h3>\n  <div ng-repeat=\"item in currentItem\">\n    <span ng-click=\"showUser(item.user.id)\"> {{item.user.name}} </span>\n  </div>\n</div>\n";
 
 /***/ }
 /******/ ]);

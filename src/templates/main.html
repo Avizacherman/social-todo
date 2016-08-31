@@ -1,17 +1,20 @@
+<h2> Welcome {{name}} </h2>
+
 <div>
-  Welcome!
-</div>
-<form ng-submit="addTask()">
-  <input placeholder="New Task" ng-model="newItem"/>
-  <button> Add </button>
-</form>
-<div ng-repeat ='item in items'>
-  <input type="checkbox" ng-model="item.does.properties.complete" ng-change="checkTask(item.does.properties.complete, item.task.id)"/>
-  <div ng-click="displayTask(item.task.id)"> {{item.task.name}} </div>
+  <h4> Add New Task </h4>
+  <form ng-submit="addTask()">
+    <input placeholder="New Task" ng-model="newItem"/>
+    <button> Add </button>
+  </form>
+  <h4> Current Tasks </h4>
+  <div ng-repeat ='item in items'>
+    <input type="checkbox" ng-model="item.does.properties.complete" ng-change="checkTask(item.does.properties.complete, item.task.id)"/>
+    <div ng-click="displayTask(item.task.id)"> {{item.task.name}} </div>
+  </div>
 </div>
 <div ng-controller="sidebarController" >
   <div ng-show="viewTaskSidebar">
-    <div ng-show="!editItem" ng-click="showInput()"> {{currentItem[0].task.name}} </div>
+    <strong> Task: </strong> <span ng-show="!editItem" ng-click="showInput()"> {{currentItem[0].task.name}} </span>
     <form ng-submit="updateTask(currentItem[0].task.id, currentItem[0].task.name)"  ng-show="editItem">
       <input ng-model="currentItem[0].task.name"/>
     </form>
@@ -19,9 +22,9 @@
     <span ng-show="currentItem[0].youDid.properties.completedAt">
       Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}
     </span>
-  </div>
-
-  <div ng-repeat="item in currentItem">
-    <div ng-click="showUser(item.user.id)"> {{item.user.name}} </div>
+    <h3> Other People with this Task <h3>
+    <div ng-repeat="item in currentItem">
+      <div ng-click="showUser(item.user.id)"> {{item.user.name}} </div>
+    </div>
   </div>
 </div>

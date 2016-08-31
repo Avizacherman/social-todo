@@ -1,7 +1,7 @@
 export default function routing($routeProvider){
   $routeProvider
   .when('/', {
-    template: require('../templates/index.html'),
+    template: require('../templates/auth.html'),
     controller: 'authController'
   })
   .when('/app', {

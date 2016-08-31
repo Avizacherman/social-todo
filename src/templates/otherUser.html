@@ -1,17 +1,19 @@
-<div>
-  {{user.name}}
-</div>
+<h2>
+  {{name}}'s List
+</h2>
 <div ng-repeat ='item in items'>
   <div ng-click="displayTask(item.task.id)"> {{item.task.name}} </div>
 </div>
 <div ng-controller="sidebarController" >
   <div ng-show="viewTaskSidebar">
+    <strong> Task: </strong> <span> {{currentItem[0].task.name}} </span>
+
     Completed: {{currentItem[0].youDid.properties.complete}}
     <span ng-show="currentItem[0].youDid.properties.completedAt">
       Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}
     </span>
   </div>
-
+  <h3> Other People with this Task <h3>
   <div ng-repeat="item in currentItem">
     <span ng-click="showUser(item.user.id)"> {{item.user.name}} </span>
   </div>
