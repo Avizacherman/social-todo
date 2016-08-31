@@ -43,8 +43,9 @@ module.exports = function(passport){
         if(err)
           res.json(failureWrapper(err, "Unable to log in"))
         else {
-          req.login(user, (err, user) => {
-
+          console.log(user)
+          req.login(user, (err) => {
+            console.log(user)
             if(err)
               res.json(failureWrapper(err, "Unable to log in"))
             else

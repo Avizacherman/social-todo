@@ -33,10 +33,8 @@ User.create = function(user){
     db.save(sanitizedUser, 'User', (err, user) => {
       if(err)
         reject(err)
-      else {
-        this.id = user.id
+      else 
         resolve(user)
-      }
     })
   })
 }
