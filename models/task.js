@@ -64,28 +64,29 @@ Task.incomplete = function(userid, taskid){
       else
         resolve(result)
     })
-    .catch(err => {
-      reject(err)
-    })
   })
 }
 
 Task.update = function(userId, taskId, newName){
-  db.query(`
-    MATCH (t:Task)<-[d:DOES]-(user:User)
-    WHERE ID(u) = ${userId} AND ID(t) = ${taskId}
-    MERGE (t2:Task {name: ${newName}})
-    CREATE (u)-[does:DOES]->(task)
-	  WITH d, does, task, user, t
-    SET does.complete = d.complete
-	  SET does.completedAt = d.completedAt
-	  DELETE d
-    RETURN does, task
-  `, (err, result) => {
-    if(err)
-      reject(err)
-    else
-      resolve(result)
+  return new Promise((resolve, reject) => {
+    db.query(`
+      MATCH (t:Task)<-[d:DOES]-(u:User)
+      WHERE ID(u) = ${userId} AND ID(t) = ${taskId}
+      MERGE (task:Task {name: "${newName}"})
+      CREATE (u)-[youDid:DOES]->(task)
+      WITH d, youDid, task, u, t
+      SET youDid.complete = d.complete
+      SET youDid.completedAt = d.completedAt
+      DELETE d
+      WITH youDid, task, u
+      OPTIONAL MATCH (u)-[youDid:DOES]->(task)<-[does:DOES]-(user:User)
+      RETURN does, task, youDid, user
+    `, (err, result) => {
+      if(err)
+        reject(err)
+      else
+        resolve(result)
+    })
   })
 }
 
@@ -100,7 +101,6 @@ Task.getWithOtherUsers = function(userId, taskId, status){
       RETURN task, does, user, youDid
       `, (err, result) => {
       if(err){
-      console.log(err)
         reject(err)
       }
       else

@@ -25,8 +25,13 @@ router.post('/', (req, res) => {
 })
 
 router.put('/edit/:taskid', (req, res) =>{
-  // Task.update(req.user.id, req.body.taskid, req.body.newName)
-  // .then()
+  Task.update(req.user.id, req.params.taskid, req.body.newName)
+  .then(task => {
+    res.json(successWrapper(task))
+  })
+  .catch(err => {
+    res.json(failureWrapper(err))
+  })
 })
 
 router.put('/complete/:status', (req, res) => {

@@ -8,4 +8,8 @@ export default function routing($routeProvider){
     template: require('../templates/main.html'),
     controller: 'mainController'
   })
+  .when('/app/user/:userid', {
+    template: require('../templates/otherUser.html'),
+    controller: 'otherUserMainController'
+  })
 }

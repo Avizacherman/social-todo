@@ -4,6 +4,7 @@ import ngRoute from 'angular-route'
 import authController from './controllers/authController'
 import mainController from './controllers/mainController'
 import sidebarController from './controllers/sidebarController'
+import otherUserMainController from './controllers/otherUserMainController'
 
 import routes from './config/routes'
 
@@ -14,3 +15,4 @@ app
 .controller('authController', authController)
 .controller('mainController', mainController)
 .controller('sidebarController', sidebarController)
+.controller('otherUserMainController', otherUserMainController)

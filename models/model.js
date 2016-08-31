@@ -20,11 +20,11 @@ Model.prototype.findOne = function(searchObj){
 
 Model.prototype.findById = function(id){
   return new Promise( (resolve, reject) => {
-    db.query(`MATCH (u:User) WHERE ID(u) = ${id} RETURN u`, (err, user) =>{
+    db.query(`MATCH (${this.label.toLowerCase()}) WHERE ID(${this.label.toLowerCase()}) = ${id} RETURN ${this.label.toLowerCase()}`, (err, result) =>{
       if(err)
         reject(err)
       else
-        resolve(user[0])
+        resolve(result[0])
     })
   })
 }

@@ -1,4 +1,4 @@
-export default function authController($scope, $http, $location){
+export default function authController($scope, $http, $location, $rootScope){
   $scope.signupEmail = ""
   $scope.signupPassword = ""
   $scope.signupName = ""
@@ -11,8 +11,10 @@ export default function authController($scope, $http, $location){
       $scope.signupName = ""
       $scope.signupError = false
 
-      if(response.data.success)
+      if(response.data.success){
+        $rootScope.myId = response.data.user.id
         $location.url('/app')
+      }
       else
         $scope.signupError = true
     })
@@ -24,14 +26,16 @@ export default function authController($scope, $http, $location){
   $scope.login = function(){
     $http.post('/auth/login', {email: $scope.loginEmail, password: $scope.loginPassword})
     .then(response => {
+      console.log(response)
       $scope.loginEmail = ""
       $scope.loginPassword = ""
       $scope.loginError = false
-
-      if(response.data.success)
+      if(response.data.success){
+        $rootScope.myId = response.data.user.id
         $location.url('/app')
+      }
       else
-        $scope.signupError = true
+        $scope.loginError = true
     })
   }
 }

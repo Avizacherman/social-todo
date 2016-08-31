@@ -47,3 +47,8 @@ A user will eventually be able to filter tasks by completed/incomplete.
 ### Comments
 
 A user will eventually be able to leave comments on a task. This will be achieved through an extended relationship: `(USER)-[MAKES]->(COMMENT)-[ON]->(TASK)`. This truly harnesses the power of neo4j to extend relationships.
+
+## Refactoring Work
+
+- Rewrite models (particularly those that have multiple related nodes) so the data sent back is in a more practical format
+- Sanitize user data to remove password hashes

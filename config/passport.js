@@ -22,7 +22,6 @@ module.exports = function(passport) {
     function(req, email, password, done) {
       User.validate(email, password)
       .then( auth => {
-        console.log(auth)
         if(!auth.success)
            done(null, false)
         else

@@ -66,7 +66,11 @@
 
 	var _sidebarController2 = _interopRequireDefault(_sidebarController);
 
-	var _routes = __webpack_require__(10);
+	var _otherUserMainController = __webpack_require__(10);
+
+	var _otherUserMainController2 = _interopRequireDefault(_otherUserMainController);
+
+	var _routes = __webpack_require__(11);
 
 	var _routes2 = _interopRequireDefault(_routes);
 
@@ -74,7 +78,7 @@
 
 	var app = _angular2.default.module('SoToDo', [_angularRoute2.default]);
 
-	app.config(_routes2.default).controller('authController', _authController2.default).controller('mainController', _mainController2.default).controller('sidebarController', _sidebarController2.default);
+	app.config(_routes2.default).controller('authController', _authController2.default).controller('mainController', _mainController2.default).controller('sidebarController', _sidebarController2.default).controller('otherUserMainController', _otherUserMainController2.default);
 
 /***/ },
 /* 1 */
@@ -32950,7 +32954,7 @@
 	  value: true
 	});
 	exports.default = authController;
-	function authController($scope, $http, $location) {
+	function authController($scope, $http, $location, $rootScope) {
 	  $scope.signupEmail = "";
 	  $scope.signupPassword = "";
 	  $scope.signupName = "";
@@ -32962,7 +32966,10 @@
 	      $scope.signupName = "";
 	      $scope.signupError = false;
 
-	      if (response.data.success) $location.url('/app');else $scope.signupError = true;
+	      if (response.data.success) {
+	        $rootScope.myId = response.data.user.id;
+	        $location.url('/app');
+	      } else $scope.signupError = true;
 	    });
 	  };
 
@@ -32971,11 +32978,14 @@
 
 	  $scope.login = function () {
 	    $http.post('/auth/login', { email: $scope.loginEmail, password: $scope.loginPassword }).then(function (response) {
+	      console.log(response);
 	      $scope.loginEmail = "";
 	      $scope.loginPassword = "";
 	      $scope.loginError = false;
-
-	      if (response.data.success) $location.url('/app');else $scope.signupError = true;
+	      if (response.data.success) {
+	        $rootScope.myId = response.data.user.id;
+	        $location.url('/app');
+	      } else $scope.loginError = true;
 	    });
 	  };
 	}
@@ -32984,12 +32994,16 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 	exports.default = mainController;
+
+	var _angular = __webpack_require__(1);
+
+	var _angular2 = _interopRequireDefault(_angular);
 
 	var _lodash = __webpack_require__(7);
 
@@ -32999,15 +33013,18 @@
 
 	// the data.data is a redundency from the api wrappers. This is intentional, to prevent mutation of
 	// the data object to begin with when adding success values
-	function mainController($scope, $http, $location) {
+	function mainController($scope, $http, $location, $rootScope) {
 	  $scope.items = [];
 	  $scope.newItem = "";
 	  $scope.errorMsg = false;
-	  $scope.currentItem = {};
+	  $rootScope.currentItem = {};
 
 	  // pull tasks from server upon loading controller
-	  var loadTasks = function loadTasks() {
+	  var init = function init() {
 	    $http.get('/api/users/tasks').then(function (response) {
+	      if (response.data.loggedOut) {
+	        $location.url('/');
+	      }
 	      if (response.data.success) {
 	        $scope.errorMsg = false;
 	        $scope.items = response.data.data;
@@ -33028,10 +33045,13 @@
 	    }).catch(function (err) {});
 	  };
 
-	  $scope.displayTask = function (item) {
-	    $http.get('/api/tasks/' + item.task.id + '/users').then(function (response) {
+	  $scope.displayTask = function (id) {
+	    console.log(id);
+	    $http.get('/api/tasks/' + id + '/users').then(function (response) {
 	      if (response.data.success) {
-	        $scope.currentItem = response.data.data;
+	        $rootScope.currentItem = response.data.data;
+	        console.log($rootScope.currentItem);
+	        $scope.originalName = _angular2.default.copy($rootScope.currentItem[0].task.name);
 	        $scope.viewTaskSidebar = true;
 	      } else console.log(response.data.msg);
 	    }).catch(function (err) {
@@ -33042,10 +33062,14 @@
 	  $scope.checkTask = function (status, id) {
 	    // console.log($scope.task[_.findIndex($scope.tasks, {t: {id}})])
 	    $http.put('/api/tasks/complete/' + status, { taskid: id }).then(function (response) {
+
 	      if (response.data.success) {
-	        debugger;
-	        // $scope.task[_.findIndex($scope.tasks, {t: {id}})] = response.data.data
-	      } else {}
+	        $scope.items[_lodash2.default.findIndex($scope.items, { task: { id: id } })] = response.data.data[0];
+	        if ($rootScope.currentItem.length > 0 && $scope.items[_lodash2.default.findIndex($scope.items, { task: { id: id } })].task.id === $rootScope.currentItem[0].task.id) console.log(id);
+	        $scope.displayTask(id);
+	      } else {
+	        $scope.items[_lodash2.default.findIndex($scope.items, { task: { id: id } })].does.properties.complete = !status;
+	      }
 	    });
 	  };
 
@@ -33053,7 +33077,7 @@
 	    $scope.errorMsg = false;
 	  };
 
-	  loadTasks();
+	  init();
 	}
 
 /***/ },
@@ -49814,7 +49838,7 @@
 
 /***/ },
 /* 9 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -49822,19 +49846,115 @@
 	  value: true
 	});
 	exports.default = sidebarController;
-	function sidebarController($scope, $http, $location) {
-	  console.log($scope.currentItem);
-	  $scope.updateTask = function (newName, id) {
-	    $.put('/api/tasks/edit/' + id, { newName: newName }).then(function (response) {
-	      if (response.data.success) {
-	        $rootScope.tasks[_.findIndex($rootScope.tasks, { t: { id: id } })] = response.data.data;
-	      } else {}
-	    });
+
+	var _angular = __webpack_require__(1);
+
+	var _angular2 = _interopRequireDefault(_angular);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function sidebarController($scope, $http, $location, $rootScope) {
+
+	  $scope.showInput = function () {
+	    $scope.editItem = true;
+	  };
+
+	  function revert() {
+	    $rootScope.currentItem[0].task.name = _angular2.default.copy($scope.originalName);
+	    $scope.editItem = false;
+	  }
+
+	  $scope.updateTask = function (originalId, newName) {
+	    if (newName != $scope.originalName) {
+	      $http.put('/api/tasks/edit/' + originalId, { newName: newName }).then(function (response) {
+
+	        if (response.data.success) {
+	          var _response$data$data$ = response.data.data[0].task;
+	          var name = _response$data$data$.name;
+	          var id = _response$data$data$.id;
+
+	          var taskIndex = _.findIndex($scope.items, { task: { id: originalId } });
+	          $scope.items[taskIndex].task.name = name;
+	          $scope.items[taskIndex].task.id = id;
+	          $rootScope.currentItem = response.data.data;
+	          $scope.originalName = _angular2.default.copy($scope.currentItem[0].task.name);
+	          $scope.editItem = false;
+	        } else {
+	          revert();
+	        }
+	      }).catch(function (err) {
+	        revert();
+	      });
+	    } else $scope.editItem = false;
+	  };
+
+	  $scope.showUser = function (userid) {
+	    if (userid === $rootScope.myId) $location.url('/app');else $location.url('/app/user/' + userid);
 	  };
 	}
 
 /***/ },
 /* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = otherUserMainController;
+
+	var _angular = __webpack_require__(1);
+
+	var _angular2 = _interopRequireDefault(_angular);
+
+	var _lodash = __webpack_require__(7);
+
+	var _lodash2 = _interopRequireDefault(_lodash);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function otherUserMainController($scope, $http, $location, $rootScope, $routeParams) {
+	  $scope.items = [];
+	  $scope.newItem = "";
+	  $scope.errorMsg = false;
+	  $rootScope.currentItem = {};
+
+	  var init = function init() {
+	    $http.get('/api/users/' + $routeParams.userid + '/tasks').then(function (response) {
+	      if (response.data.loggedOut) {
+	        $location.url('/');
+	      }
+	      if (response.data.success) {
+	        $scope.errorMsg = false;
+	        $scope.items = response.data.data;
+	      } else {
+	        console.log(response);
+
+	        $scope.errorMsg = response.data.msg;
+	      }
+	    });
+	  };
+
+	  $scope.displayTask = function (id) {
+	    console.log(id);
+	    $http.get('/api/users/' + $routeParams.userid + '/task/' + id + '/users').then(function (response) {
+	      if (response.data.success) {
+	        $rootScope.currentItem = response.data.data;
+	        console.log($rootScope.currentItem);
+	        $scope.originalName = _angular2.default.copy($rootScope.currentItem[0].task.name);
+	        $scope.viewTaskSidebar = true;
+	      } else console.log(response.data.msg);
+	    }).catch(function (err) {
+	      console.log(err);
+	    });
+	  };
+
+	  init();
+	}
+
+/***/ },
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -49845,25 +49965,34 @@
 	exports.default = routing;
 	function routing($routeProvider) {
 	  $routeProvider.when('/', {
-	    template: __webpack_require__(11),
+	    template: __webpack_require__(12),
 	    controller: 'authController'
 	  }).when('/app', {
-	    template: __webpack_require__(12),
+	    template: __webpack_require__(13),
 	    controller: 'mainController'
+	  }).when('/app/user/:userid', {
+	    template: __webpack_require__(14),
+	    controller: 'otherUserMainController'
 	  });
 	}
-
-/***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-	module.exports = "<form ng-submit=\"login()\">\n  <input ng-model=\"loginEmail\"/>\n  <input type=\"password\" ng-model=\"loginPassword\"/>\n  <button>Submit </button>\n</form>\n<div ng-show=\"loginError\"> Invalid Email/Password</div>\n\n<form ng-submit=\"signup()\">\n  <input placeholder=\"name\" ng-model=\"signupName\">\n  <input placeholder=\"email\" ng-model=\"signupEmail\">\n  <input placeholder=\"password\" type=\"password\" ng-model=\"signupPassword\">\n  <button> Submit </button>\n</form>\n<div ng-show=\"signupError\"> Something went wrong on signup </div>\n";
 
 /***/ },
 /* 12 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\n  Welcome!\n</div>\n<form ng-submit=\"addTask()\">\n  <input placeholder=\"New Task\" ng-model=\"newItem\"/>\n  <button> Add </button>\n</form>\n<div ng-repeat ='item in items'>\n  <input type=\"checkbox\" ng-model=\"item.does.properties.complete\" ng-change=\"checkTask(item.does.properties.complete, item.task.id)\"/>\n  <div ng-click=\"displayTask(item)\"> {{item.task.name}} </div>\n</div>\n<div ng-controller=\"sidebarController\" >\n  <div ng-show=\"viewTaskSidebar\">\n    {{currentItem[0].task.name}}\n    Completed: {{currentItem[0].youDid.properties.complete}}\n    <span ng-show=\"currentItem[0].youDid.properties.completedAt\">\n      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}\n    </span>\n  </div>\n  <form ng-submit=\"updateTask(currentItem[0].task.id, currentItem[0].task.name)\"  ng-show=\"editTaskSidebar\">\n    <input ng-model=\"currentItem[0].task.name\"/>\n  </form>\n  <div ng-repeat=\"item in currentItem\">\n    <span ng-click=\"showUser(item.user.id)\"> {{item.user.name}} </span>\n  </div>\n</div>\n";
+	module.exports = "<form ng-submit=\"login()\">\n  <input ng-model=\"loginEmail\"/>\n  <input type=\"password\" ng-model=\"loginPassword\"/>\n  <button>Submit </button>\n</form>\n<div ng-show=\"loginError\"> Invalid Email/Password</div>\n\n<form ng-submit=\"signup()\">\n  <input placeholder=\"name\" ng-model=\"signupName\">\n  <input placeholder=\"email\" ng-model=\"signupEmail\">\n  <input placeholder=\"password\" type=\"password\" ng-model=\"signupPassword\">\n  <button> Submit </button>\n</form>\n<div ng-show=\"signupError\"> Something went wrong on signup </div>\n";
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	module.exports = "<div>\n  Welcome!\n</div>\n<form ng-submit=\"addTask()\">\n  <input placeholder=\"New Task\" ng-model=\"newItem\"/>\n  <button> Add </button>\n</form>\n<div ng-repeat ='item in items'>\n  <input type=\"checkbox\" ng-model=\"item.does.properties.complete\" ng-change=\"checkTask(item.does.properties.complete, item.task.id)\"/>\n  <div ng-click=\"displayTask(item.task.id)\"> {{item.task.name}} </div>\n</div>\n<div ng-controller=\"sidebarController\" >\n  <div ng-show=\"viewTaskSidebar\">\n    <div ng-show=\"!editItem\" ng-click=\"showInput()\"> {{currentItem[0].task.name}} </div>\n    <form ng-submit=\"updateTask(currentItem[0].task.id, currentItem[0].task.name)\"  ng-show=\"editItem\">\n      <input ng-model=\"currentItem[0].task.name\"/>\n    </form>\n    Completed: {{currentItem[0].youDid.properties.complete}}\n    <span ng-show=\"currentItem[0].youDid.properties.completedAt\">\n      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}\n    </span>\n  </div>\n\n  <div ng-repeat=\"item in currentItem\">\n    <div ng-click=\"showUser(item.user.id)\"> {{item.user.name}} </div>\n  </div>\n</div>\n";
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	module.exports = "<div>\n  {{user.name}}\n</div>\n<div ng-repeat ='item in items'>\n  <div ng-click=\"displayTask(item.task.id)\"> {{item.task.name}} </div>\n</div>\n<div ng-controller=\"sidebarController\" >\n  <div ng-show=\"viewTaskSidebar\">\n    Completed: {{currentItem[0].youDid.properties.complete}}\n    <span ng-show=\"currentItem[0].youDid.properties.completedAt\">\n      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}\n    </span>\n  </div>\n\n  <div ng-repeat=\"item in currentItem\">\n    <span ng-click=\"showUser(item.user.id)\"> {{item.user.name}} </span>\n  </div>\n</div>\n";
 
 /***/ }
 /******/ ]);

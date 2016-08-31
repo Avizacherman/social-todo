@@ -7,20 +7,21 @@
 </form>
 <div ng-repeat ='item in items'>
   <input type="checkbox" ng-model="item.does.properties.complete" ng-change="checkTask(item.does.properties.complete, item.task.id)"/>
-  <div ng-click="displayTask(item)"> {{item.task.name}} </div>
+  <div ng-click="displayTask(item.task.id)"> {{item.task.name}} </div>
 </div>
 <div ng-controller="sidebarController" >
   <div ng-show="viewTaskSidebar">
-    {{currentItem[0].task.name}}
+    <div ng-show="!editItem" ng-click="showInput()"> {{currentItem[0].task.name}} </div>
+    <form ng-submit="updateTask(currentItem[0].task.id, currentItem[0].task.name)"  ng-show="editItem">
+      <input ng-model="currentItem[0].task.name"/>
+    </form>
     Completed: {{currentItem[0].youDid.properties.complete}}
     <span ng-show="currentItem[0].youDid.properties.completedAt">
       Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}
     </span>
   </div>
-  <form ng-submit="updateTask(currentItem[0].task.id, currentItem[0].task.name)"  ng-show="editTaskSidebar">
-    <input ng-model="currentItem[0].task.name"/>
-  </form>
+
   <div ng-repeat="item in currentItem">
-    <span ng-click="showUser(item.user.id)"> {{item.user.name}} </span>
+    <div ng-click="showUser(item.user.id)"> {{item.user.name}} </div>
   </div>
 </div>

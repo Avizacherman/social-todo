@@ -1,16 +1,23 @@
+"use strict"
+
+import angular from 'angular'
+
 import _ from 'lodash'
 // the data.data is a redundency from the api wrappers. This is intentional, to prevent mutation of
 // the data object to begin with when adding success values
-export default function mainController($scope, $http, $location){
+export default function mainController($scope, $http, $location, $rootScope){
   $scope.items = []
   $scope.newItem = ""
   $scope.errorMsg = false
-  $scope.currentItem = {}
+  $rootScope.currentItem = {}
 
   // pull tasks from server upon loading controller
-  var loadTasks = function(){
+  var init = function(){
     $http.get('/api/users/tasks')
     .then(response => {
+      if(response.data.loggedOut){
+        $location.url('/')
+      }
       if(response.data.success){
         $scope.errorMsg = false
         $scope.items = response.data.data
@@ -19,6 +26,7 @@ export default function mainController($scope, $http, $location){
       }
     })
   }
+
 
   $scope.addTask = function(){
     $http.post('/api/tasks', {name: $scope.newItem})
@@ -35,11 +43,14 @@ export default function mainController($scope, $http, $location){
     })
   }
 
-  $scope.displayTask = function(item){
-    $http.get(`/api/tasks/${item.task.id}/users`)
+  $scope.displayTask = function(id){
+    console.log(id)
+    $http.get(`/api/tasks/${id}/users`)
     .then(response => {
       if(response.data.success){
-        $scope.currentItem = response.data.data
+        $rootScope.currentItem = response.data.data
+        console.log($rootScope.currentItem)
+        $scope.originalName = angular.copy($rootScope.currentItem[0].task.name)
         $scope.viewTaskSidebar = true
       }
       else
@@ -56,10 +67,14 @@ export default function mainController($scope, $http, $location){
     // console.log($scope.task[_.findIndex($scope.tasks, {t: {id}})])
     $http.put('/api/tasks/complete/' + status, {taskid: id})
     .then(response => {
+
       if(response.data.success){
-        debugger
-        // $scope.task[_.findIndex($scope.tasks, {t: {id}})] = response.data.data
+        $scope.items[_.findIndex($scope.items, {task: {id: id}})] = response.data.data[0]
+        if($rootScope.currentItem.length > 0 && $scope.items[_.findIndex($scope.items, {task: {id: id}})].task.id === $rootScope.currentItem[0].task.id)
+        console.log(id)
+            $scope.displayTask(id)
       } else {
+        $scope.items[_.findIndex($scope.items, {task: {id: id}})].does.properties.complete = !status
       }
     })
   }
@@ -68,5 +83,5 @@ export default function mainController($scope, $http, $location){
     $scope.errorMsg = false
   }
 
-  loadTasks()
+  init()
 }
