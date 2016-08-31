@@ -2,6 +2,12 @@
 <html>
   <head>
     <title>{{title}}</title>
+    <script>
+    //bootstrapping userID
+    {{#if user}}
+    var _userid = {{user.id}}
+    {{/if}}
+    </script>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="/javascript/app.js"></script>
   </head>

@@ -1,4 +1,10 @@
 export default function authController($scope, $http, $location, $rootScope){
+  function init(){
+    if(_userid){
+      $location.url('/app')
+    }
+  }
+
   $scope.signupEmail = ""
   $scope.signupPassword = ""
   $scope.signupName = ""
@@ -38,4 +44,6 @@ export default function authController($scope, $http, $location, $rootScope){
         $scope.loginError = true
     })
   }
+  
+  init()
 }

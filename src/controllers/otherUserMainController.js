@@ -28,12 +28,10 @@ export default function otherUserMainController($scope, $http, $location, $rootS
   }
 
   $scope.displayTask = function(id){
-    console.log(id)
     $http.get(`/api/users/${$routeParams.userid}/task/${id}/users`)
     .then(response => {
       if(response.data.success){
         $rootScope.currentItem = response.data.data
-        console.log($rootScope.currentItem)
         $scope.originalName = angular.copy($rootScope.currentItem[0].task.name)
         $scope.viewTaskSidebar = true
       }

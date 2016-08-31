@@ -37,8 +37,8 @@ export default function sidebarController($scope, $http, $location, $rootScope){
   }
 
   $scope.showUser = function(userid){
-    if(userid === $rootScope.myId)
-      $location.url(`/app`)    
+    if(userid === (_userid || $rootScope.myId))
+      $location.url(`/app`)
     else
       $location.url(`/app/user/${userid}`)
   }

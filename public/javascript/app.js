@@ -32955,6 +32955,12 @@
 	});
 	exports.default = authController;
 	function authController($scope, $http, $location, $rootScope) {
+	  function init() {
+	    if (_userid) {
+	      $location.url('/app');
+	    }
+	  }
+
 	  $scope.signupEmail = "";
 	  $scope.signupPassword = "";
 	  $scope.signupName = "";
@@ -32988,6 +32994,8 @@
 	      } else $scope.loginError = true;
 	    });
 	  };
+
+	  init();
 	}
 
 /***/ },
@@ -49889,7 +49897,7 @@
 	  };
 
 	  $scope.showUser = function (userid) {
-	    if (userid === $rootScope.myId) $location.url('/app');else $location.url('/app/user/' + userid);
+	    if (userid === (_userid || $rootScope.myId)) $location.url('/app');else $location.url('/app/user/' + userid);
 	  };
 	}
 
@@ -49937,11 +49945,9 @@
 	  };
 
 	  $scope.displayTask = function (id) {
-	    console.log(id);
 	    $http.get('/api/users/' + $routeParams.userid + '/task/' + id + '/users').then(function (response) {
 	      if (response.data.success) {
 	        $rootScope.currentItem = response.data.data;
-	        console.log($rootScope.currentItem);
 	        $scope.originalName = _angular2.default.copy($rootScope.currentItem[0].task.name);
 	        $scope.viewTaskSidebar = true;
 	      } else console.log(response.data.msg);
