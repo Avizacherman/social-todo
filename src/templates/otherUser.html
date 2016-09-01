@@ -20,10 +20,12 @@
       <div ng-show="currentItem[0].youDid.properties.completedAt">
         Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}
       </div>
-      <h3> Other People with this Task </h3>
-      <ul ng-repeat="item in currentItem">
-        <li ng-click="showUser(item.user.id)" ng-class="{checkmark: item.does.properties.complete, xmark: !item.does.properties.complete}"> {{item.user.name}} </li>
-      </ul>
+      <div ng-show="currentItem[0].user != null">
+        <h3> Other People with this Task </h3>
+        <ul ng-repeat="item in currentItem">
+          <li ng-click="showUser(item.user.id)" ng-class="{checkmark: item.does.properties.complete, xmark: !item.does.properties.complete}"> {{item.user.name}} </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
