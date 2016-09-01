@@ -1,21 +1,29 @@
+<span> <a href="/#/app"> Home </a> </span>
+<span> <a href="/auth/logout"> Logout </a> </span>
 <h2>
   {{name}}'s List
 </h2>
-<div ng-repeat ='item in items'>
-  <div ng-click="displayTask(item.task.id)"> {{item.task.name}} </div>
+<div class="col-md-6">
+
+  <ul ng-repeat ='item in items'>
+    <li ng-class="{checkmark: item.does.properties.complete, xmark: !item.does.properties.complete}" ng-click="displayTask(item.task.id)"> {{item.task.name}} </li>
+  </ul>
 </div>
+<div class="col-md-6">
+
 <div ng-controller="sidebarController" >
-  <div ng-show="viewTaskSidebar">
-    <strong> Task: </strong> <span> {{currentItem[0].task.name}} </span>
-
-    Completed: {{currentItem[0].youDid.properties.complete}}
-    <span ng-show="currentItem[0].youDid.properties.completedAt">
-      Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}
-    </span>
-    <h3> Other People with this Task <h3>
-    <div ng-repeat="item in currentItem">
-      <span ng-click="showUser(item.user.id)"> {{item.user.name}} </span>
+    <div ng-show="viewTaskSidebar">
+    <h4 class="inline"> <strong> Task: </strong> <span ng-show="!editItem" ng-click="showInput()"> {{currentItem[0].task.name}} </span> </h4>
+      <div>
+        Completed: {{currentItem[0].youDid.properties.complete}}
+      </div>
+      <div ng-show="currentItem[0].youDid.properties.completedAt">
+        Finished On {{currentItem[0].youDid.properties.completedAt | date:'short' }}
+      </div>
+      <h3> Other People with this Task </h3>
+      <ul ng-repeat="item in currentItem">
+        <li ng-click="showUser(item.user.id)" ng-class="{checkmark: item.does.properties.complete, xmark: !item.does.properties.complete}"> {{item.user.name}} </li>
+      </ul>
     </div>
-
   </div>
 </div>

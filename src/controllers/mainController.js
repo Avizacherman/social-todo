@@ -10,7 +10,7 @@ export default function mainController($scope, $http, $location, $rootScope){
   $scope.newItem = ""
   $scope.errorMsg = false
   $rootScope.currentItem = {}
-  $scope.name = _user.name || $rootScope.myName 
+  $scope.name = _user.name || $rootScope.myName
 
   // pull tasks from server upon loading controller
   var init = function(){
@@ -45,7 +45,6 @@ export default function mainController($scope, $http, $location, $rootScope){
   }
 
   $scope.displayTask = function(id){
-    console.log(id)
     $http.get(`/api/tasks/${id}/users`)
     .then(response => {
       if(response.data.success){

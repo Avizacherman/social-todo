@@ -77,6 +77,7 @@ Task.update = function(userId, taskId, newName){
       WITH d, youDid, task, u, t
       SET youDid.complete = d.complete
       SET youDid.completedAt = d.completedAt
+      SET youDid.startedAt = d.startedAt
       DELETE d
       WITH youDid, task, u
       OPTIONAL MATCH (u)-[youDid:DOES]->(task)<-[does:DOES]-(user:User)

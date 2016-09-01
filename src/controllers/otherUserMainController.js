@@ -17,14 +17,10 @@ export default function otherUserMainController($scope, $http, $location, $rootS
         $location.url('/')
       }
       if(response.data.success){
-        console.log(response)
-
         $scope.errorMsg = false
         $scope.items = response.data.data
         $scope.name = response.data.data[0].self.name
       } else {
-        console.log(response)
-
         $scope.errorMsg = response.data.msg
       }
     })

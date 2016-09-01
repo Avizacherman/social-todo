@@ -37,7 +37,6 @@ export default function authController($scope, $http, $location, $rootScope){
   $scope.login = function(){
     $http.post('/auth/login', {email: $scope.loginEmail, password: $scope.loginPassword})
     .then(response => {
-      console.log(response)
       $scope.loginEmail = ""
       $scope.loginPassword = ""
       $scope.loginError = false

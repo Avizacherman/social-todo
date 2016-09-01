@@ -52,3 +52,5 @@ A user will eventually be able to leave comments on a task. This will be achieve
 
 - Rewrite models (particularly those that have multiple related nodes) so the data sent back is in a more practical format
 - Sanitize user data to remove password hashes
+- Prevent empty strings for tasks
+- Case sensitivity for tasks

@@ -1,8 +1,42 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+.inline {
+  display: inline-block;
 }
 
-a {
-  color: #00B7FF;
+.auth-input {
+  display: block;
+  margin: 5px 0;
+}
+
+.checkmark {
+  list-style-type: none;
+}
+
+.xmark {
+  list-style-type: none;
+}
+
+.checkmark::before{
+  display: inline-block;
+  content: '';
+  height: 16px;
+  width: 16px;
+  -webkit-transform: translateY(3px);
+  -ms-transform: translateY(3px);
+  -o-transform: translateY(3px);
+  transform: translateY(3px);
+  background-size: 16px 16px;
+  background-image: url('https://openclipart.org/download/202732/checkmark.svg');
+}
+
+.xmark::before{
+  display: inline-block;
+  content: '';
+  height: 16px;
+  width: 16px;
+  -webkit-transform: translateY(3px);
+  -ms-transform: translateY(3px);
+  -o-transform: translateY(3px);
+  transform: translateY(3px);
+  background-size: 16px 16px;
+  background-image: url('http://vignette1.wikia.nocookie.net/okami/images/6/60/X_mark.png/revision/20130610184558');
 }

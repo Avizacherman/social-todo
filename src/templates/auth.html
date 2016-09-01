@@ -1,16 +1,19 @@
-<h3> Login </h3>
-<form ng-submit="login()">
-  <input placeholder="email" ng-model="loginEmail"/>
-  <input placeholder="password" type="password" ng-model="loginPassword"/>
-  <button>Submit </button>
-</form>
-<div ng-show="loginError"> Invalid Email/Password</div>
-
-<h3> Signup </h3>
-<form ng-submit="signup()">
-  <input placeholder="name" ng-model="signupName">
-  <input placeholder="email" ng-model="signupEmail">
-  <input placeholder="password" type="password" ng-model="signupPassword">
-  <button> Submit </button>
-</form>
-<div ng-show="signupError"> Something went wrong on signup </div>
+<div class="col-md-6">
+  <h3> Login </h3>
+  <form ng-submit="login()">
+    <input class="auth-input" placeholder="email" ng-model="loginEmail"/>
+    <input class="auth-input" placeholder="password" type="password" ng-model="loginPassword"/>
+    <button>Submit </button>
+  </form>
+  <div ng-show="loginError"> Invalid Email/Password</div>
+</div>
+<div class="col-md-6">
+  <h3> Signup </h3>
+  <form ng-submit="signup()">
+    <input class="auth-input" placeholder="name" ng-model="signupName">
+    <input class="auth-input" placeholder="email" ng-model="signupEmail">
+    <input class="auth-input" placeholder="password" type="password" ng-model="signupPassword">
+    <button> Submit </button>
+  </form>
+  <div ng-show="signupError"> Something went wrong on signup </div>
+</div>
